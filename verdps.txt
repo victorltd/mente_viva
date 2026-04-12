@@ -1,0 +1,19 @@
+  ✦ Pronto! Criei duas correções:
+
+    O que foi feito:
+
+     1. `tools/migration_fix_assignment_status_cast.sql` - Script de migração que você deve executar uma vez no Supabase SQL Editor. Ele:
+        - Dropa a função antiga update_assignment_after_response()
+        - Recria com o cast explícito 'completed'::assignment_status e 'active'::assignment_status
+        - Recria o trigger apontando para a função corrigida
+        - É seguro executar mesmo com as tabelas já existentes
+
+     2. `tools/schema_scales.sql` - Atualizado com a correção para futuros schemas
+
+    Como aplicar:
+
+     1. Vá ao Supabase Dashboard → SQL Editor
+     2. Cole o conteúdo do arquivo migration_fix_assignment_status_cast.sql
+     3. Clique em Run
+
+    Depois disso, ao responder uma escala, o trigger vai atualizar o status corretamente sem o erro de cast! 🎉

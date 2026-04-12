@@ -212,7 +212,7 @@ class SettingsScreen extends ConsumerWidget {
 
                       if (confirm == true) {
                         await ref.read(authProvider.notifier).signOut();
-                        if (context.mounted) context.go('/login');
+                        if (context.mounted) context.go('/');
                       }
                     },
                   ),

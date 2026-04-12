@@ -81,6 +81,23 @@ class AuthNotifier extends Notifier<AppAuthState> {
   }
 
   // ══════════════════════════════════════
+  // CHECK AUTH (para splash screen)
+  // ══════════════════════════════════════
+  Future<void> checkAuth() async {
+    final session = _client.auth.currentSession;
+    
+    if (session != null) {
+      state = state.copyWith(
+        user: session.user,
+        isLoading: true,
+      );
+      await _loadProfile();
+    } else {
+      state = const AppAuthState();
+    }
+  }
+
+  // ══════════════════════════════════════
   // CARREGAR PERFIL
   // ══════════════════════════════════════
   Future<void> _loadProfile() async {

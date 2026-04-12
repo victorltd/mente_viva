@@ -14,6 +14,7 @@ import '../../../providers/alert_provider.dart';
 import '../../../providers/task_provider.dart';
 import '../../../providers/feature_provider.dart';
 import '../widgets/alert_card.dart';
+import '../widgets/patient_scales_tab.dart';
 
 class PatientDetailScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> patient;
@@ -34,7 +35,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     Future.microtask(() => _loadData());
   }
 
@@ -109,6 +110,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen>
               ),
               text: 'Tarefas',
             ),
+            const Tab(icon: Icon(Icons.analytics_outlined), text: 'Escalas'),
             Tab(
               icon: Badge(
                 isLabelVisible: patientAlerts.isNotEmpty,
@@ -128,6 +130,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen>
         children: [
           _buildMoodTab(),
           _buildTasksTab(featureState, patientId),
+          _buildScalesTab(patientId, patientName),
           _buildAlertsTab(patientAlerts),
         ],
       ),
@@ -292,6 +295,16 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen>
     if (confirm == true) {
       await ref.read(taskProvider.notifier).deleteTask(taskId);
     }
+  }
+
+  // ══════════════════════════════════════
+  // TAB ESCALAS
+  // ══════════════════════════════════════
+  Widget _buildScalesTab(String patientId, String patientName) {
+    return PatientScalesTab(
+      patientId: patientId,
+      patientName: patientName,
+    );
   }
 
   // ══════════════════════════════════════

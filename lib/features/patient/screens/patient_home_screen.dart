@@ -14,6 +14,10 @@ import '../../../providers/task_provider.dart';
 import '../../../providers/feature_provider.dart';
 import '../../../providers/achievement_provider.dart';
 import '../../../models/achievement_model.dart';
+import '../../../providers/scale_assignments_provider.dart';
+import '../../../providers/scale_templates_provider.dart';
+import '../../../providers/custom_scales_provider.dart';
+import '../widgets/pending_scale_card.dart';
 import '../widgets/achievement_popup.dart';
 
 class PatientHomeScreen extends ConsumerStatefulWidget {
@@ -23,13 +27,29 @@ class PatientHomeScreen extends ConsumerStatefulWidget {
   ConsumerState<PatientHomeScreen> createState() => _PatientHomeScreenState();
 }
 
-class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
+class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen>
+    with WidgetsBindingObserver {
   int _currentNavIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(() => _loadData());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _loadData();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -48,6 +68,16 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
       final features = ref.read(featureProvider);
       if (features.tasksEnabled) {
         await ref.read(taskProvider.notifier).loadPatientTasks(patient.id);
+      }
+
+      // Carregar escalas pendentes
+      await ref
+          .read(scaleAssignmentsProvider.notifier)
+          .loadPendingForPatient(patient.id);
+
+      // Carregar templates para nomes das escalas
+      if (ref.read(scaleTemplatesProvider).templates.isEmpty) {
+        await ref.read(scaleTemplatesProvider.notifier).loadTemplates();
       }
 
       // ══════════════════════════════════════
@@ -148,7 +178,7 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
             onSelected: (value) async {
               if (value == 'logout') {
                 await ref.read(authProvider.notifier).signOut();
-                if (context.mounted) context.go('/login');
+                if (context.mounted) context.go('/');
               }
             },
           ),
@@ -344,6 +374,13 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
                     ],
 
                     // ══════════════════════════════════════
+                    // ESCALAS PENDENTES
+                    // ══════════════════════════════════════
+                    _buildPendingScales(),
+
+                    const SizedBox(height: AppSizes.lg),
+
+                    // ══════════════════════════════════════
                     // HUMOR DA SEMANA
                     // ══════════════════════════════════════
                     if (checkinState.weekCheckins.isNotEmpty) ...[
@@ -471,6 +508,96 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
     ));
 
     return items;
+  }
+
+  // ══════════════════════════════════════
+  // ESCALAS PENDENTES
+  // ══════════════════════════════════════
+  Widget _buildPendingScales() {
+    final assignmentsState = ref.watch(scaleAssignmentsProvider);
+    final templatesState = ref.watch(scaleTemplatesProvider);
+    // loadPendingForPatient já filtra apenas as pendentes,
+    // então usamos assignments diretamente
+    final pending = assignmentsState.assignments;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '📋 Escalas',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSizes.sm),
+        if (pending.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSizes.lg),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+              border: Border.all(color: Colors.grey.shade100),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.analytics_outlined,
+                  size: 48,
+                  color: AppColors.textLight.withOpacity(0.5),
+                ),
+                const SizedBox(height: AppSizes.sm),
+                Text(
+                  'Nenhuma escala pendente',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                ),
+                const SizedBox(height: AppSizes.xs),
+                Text(
+                  'Quando seu psicólogo atribuir uma escala, ela aparecerá aqui.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
+        else
+          ...pending.map((assignment) {
+            String scaleName = assignment.scaleLabel;
+            String? scaleDesc;
+            String estimatedTime = '~3 min';
+
+            if (assignment.isTemplate) {
+              final template =
+                  templatesState.getTemplateById(assignment.scaleId);
+              if (template != null) {
+                scaleName = template.name;
+                scaleDesc = template.description;
+                estimatedTime = template.estimatedTime;
+              }
+            } else {
+              scaleName = 'Escala Personalizada';
+              estimatedTime = '~5 min';
+            }
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSizes.sm),
+              child: PendingScaleCard(
+                assignment: assignment,
+                scaleName: scaleName,
+                scaleDescription: scaleDesc,
+                estimatedTime: estimatedTime,
+              ),
+            );
+          }).toList(),
+      ],
+    );
   }
 
   // ══════════════════════════════════════

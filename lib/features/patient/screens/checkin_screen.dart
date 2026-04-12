@@ -263,56 +263,62 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSizes.xxl),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (index) {
-            final score = index + 1;
-            final isSelected = _selectedMood == score;
-            return GestureDetector(
-              onTap: () {
-                setState(() => _selectedMood = score);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(AppSizes.md),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.moodColor(score).withOpacity(0.15)
-                      : AppColors.surface,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.moodColor(score)
-                        : Colors.grey.shade200,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      AppConstants.moodEmojis[score]!,
-                      style: TextStyle(
-                        fontSize: isSelected ? 40 : 32,
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: List.generate(5, (index) {
+              final score = index + 1;
+              final isSelected = _selectedMood == score;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() => _selectedMood = score);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(AppSizes.md),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.moodColor(score).withOpacity(0.15)
+                          : AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.moodColor(score)
+                            : Colors.grey.shade200,
+                        width: isSelected ? 2 : 1,
                       ),
                     ),
-                    const SizedBox(height: AppSizes.xs),
-                    Text(
-                      AppConstants.moodLabels[score]!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: isSelected
-                                ? AppColors.moodColor(score)
-                                : AppColors.textLight,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                    child: Column(
+                      children: [
+                        Text(
+                          AppConstants.moodEmojis[score]!,
+                          style: TextStyle(
+                            fontSize: isSelected ? 40 : 32,
                           ),
-                      textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSizes.xs),
+                        Text(
+                          AppConstants.moodLabels[score]!,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: isSelected
+                                    ? AppColors.moodColor(score)
+                                    : AppColors.textLight,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ],
     );

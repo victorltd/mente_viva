@@ -245,7 +245,7 @@ class _PsiHomeScreenState extends ConsumerState<PsiHomeScreen> {
                 context.push('/psi/settings');
               } else if (value == 'logout') {
                 await ref.read(authProvider.notifier).signOut();
-                if (mounted) context.go('/login');
+                if (mounted) context.go('/');
               }
             },
           ),

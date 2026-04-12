@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#66BB6A"/>
+      <stop offset="100%" style="stop-color:#4CAF50"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Brain/Mind symbol -->
+  <g transform="translate(256, 256)">
+    <!-- Outer circle -->
+    <circle cx="0" cy="0" r="140" fill="none" stroke="white" stroke-width="12" opacity="0.9"/>
+    
+    <!-- Brain curves -->
+    <path d="M -60,-40 C -80,-80 -40,-100 0,-90 C 40,-100 80,-80 60,-40" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <path d="M -70,0 C -90,-20 -80,-50 -50,-60" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 70,0 C 90,-20 80,-50 50,-60" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <path d="M -70,20 C -90,0 -80,30 -50,40" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 70,20 C 90,0 80,30 50,40" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    
+    <!-- Center line -->
+    <line x1="0" y1="-90" x2="0" y2="60" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    
+    <!-- Bottom curves -->
+    <path d="M -50,40 C -30,80 30,80 50,40" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    
+    <!-- Neural dots -->
+    <circle cx="-60" cy="-40" r="8" fill="white"/>
+    <circle cx="60" cy="-40" r="8" fill="white"/>
+    <circle cx="-70" cy="0" r="8" fill="white"/>
+    <circle cx="70" cy="0" r="8" fill="white"/>
+    <circle cx="-50" cy="40" r="8" fill="white"/>
+    <circle cx="50" cy="40" r="8" fill="white"/>
+    <circle cx="0" cy="-90" r="8" fill="white"/>
+    <circle cx="0" cy="60" r="8" fill="white"/>
+  </g>
+</svg>

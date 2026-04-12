@@ -32,37 +32,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await ref.read(authProvider.notifier).signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+    try {
+      final success = await ref.read(authProvider.notifier).signIn(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
 
-    if (success && mounted) {
-      // Verificar consentimento após login
-      await ref.read(consentProvider.notifier).checkConsent();
-      final consentState = ref.read(consentProvider);
+      if (success && mounted) {
+        // Verificar consentimento após login
+        await ref.read(consentProvider.notifier).checkConsent();
+        final consentState = ref.read(consentProvider);
 
-      final profile = ref.read(authProvider).profile;
-      if (profile == null) return;
+        final profile = ref.read(authProvider).profile;
+        if (profile == null) return;
 
-      if (consentState.needsReConsent) {
-        final redirectTarget = profile.isPsychologist ? '/psi' : '/app';
-        context.go('/legal/consent', extra: redirectTarget);
-        return;
+        if (consentState.needsReConsent) {
+          final redirectTarget = profile.isPsychologist ? '/psi' : '/app';
+          context.go('/legal/consent', extra: redirectTarget);
+          return;
+        }
+
+        if (profile.onboardingCompleted) {
+          if (profile.isPsychologist) {
+            context.go('/psi');
+          } else {
+            context.go('/app');
+          }
+        } else {
+          if (profile.isPsychologist) {
+            context.go('/onboarding/psychologist');
+          } else {
+            context.go('/onboarding/patient');
+          }
+        }
       }
-
-      if (profile.onboardingCompleted) {
-        if (profile.isPsychologist) {
-          context.go('/psi');
-        } else {
-          context.go('/app');
-        }
-      } else {
-        if (profile.isPsychologist) {
-          context.go('/onboarding/psychologist');
-        } else {
-          context.go('/onboarding/patient');
-        }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro de conexão. Verifique sua internet e tente novamente.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }

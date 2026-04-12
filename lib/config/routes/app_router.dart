@@ -12,6 +12,11 @@ import '../../features/psychologist/screens/alerts_screen.dart';
 import '../../features/psychologist/screens/settings_screen.dart';
 import '../../features/psychologist/screens/create_task_screen.dart';
 import '../../features/psychologist/screens/psi_task_detail_screen.dart';
+import '../../features/psychologist/screens/scale_results_screen.dart';
+import '../../features/psychologist/screens/select_scale_screen.dart';
+import '../../features/psychologist/screens/configure_scale_screen.dart';
+import '../../features/psychologist/screens/edit_scale_screen.dart';
+import '../../features/psychologist/screens/create_custom_scale_screen.dart';
 import '../../features/patient/screens/patient_home_screen.dart';
 import '../../features/patient/screens/checkin_screen.dart';
 import '../../features/patient/screens/evolution_screen.dart';
@@ -19,19 +24,29 @@ import '../../features/patient/screens/tasks_screen.dart';
 import '../../features/patient/screens/task_detail_screen.dart';
 import '../../models/task_model.dart';
 import '../../features/patient/screens/achievements_screen.dart';
+import '../../features/patient/screens/answer_scale_screen.dart';
+import '../../features/patient/screens/scale_completed_screen.dart';
 import '../../features/legal/screens/consent_screen.dart';
 import '../../features/legal/screens/terms_screen.dart';
 import '../../features/legal/screens/privacy_policy_screen.dart';
 import '../../features/legal/screens/data_export_screen.dart';
 import '../../features/legal/screens/delete_account_screen.dart';
-
+import '../../features/splash/splash_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     debugLogDiagnostics: true,
 
     routes: [
+      // ══════════════════════════════════════
+      // SPLASH (verifica sessão)
+      // ══════════════════════════════════════
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
       // ══════════════════════════════════════
       // AUTH
       // ══════════════════════════════════════
@@ -92,6 +107,55 @@ class AppRouter {
           return PsiTaskDetailScreen(task: task);
         },
       ),
+      GoRoute(
+        path: '/psi/scale-results',
+        builder: (context, state) {
+          final assignmentId = state.extra as String;
+          return ScaleResultsScreen(assignmentId: assignmentId);
+        },
+      ),
+      GoRoute(
+        path: '/psi/select-scale',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return SelectScaleScreen(
+            patientId: data['patientId'] as String,
+            patientName: data['patientName'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/psi/configure-scale',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return ConfigureScaleScreen(
+            template: data['template'],
+            customScale: data['customScale'],
+            patientId: data['patientId'] as String,
+            patientName: data['patientName'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/psi/edit-scale',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return EditScaleScreen(
+            template: data['template'],
+            patientId: data['patientId'] as String,
+            patientName: data['patientName'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/psi/create-custom-scale',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return CreateCustomScaleScreen(
+            patientId: data['patientId'] as String,
+          );
+        },
+      ),
 
       // ══════════════════════════════════════
       // PACIENTE
@@ -122,6 +186,23 @@ class AppRouter {
       GoRoute(
       path: '/app/achievements',
       builder: (context, state) => const AchievementsScreen(),
+      ),
+      GoRoute(
+        path: '/app/scale-answer',
+        builder: (context, state) {
+          final assignmentId = state.extra as String;
+          return AnswerScaleScreen(assignmentId: assignmentId);
+        },
+      ),
+      GoRoute(
+        path: '/app/scale-completed',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return ScaleCompletedScreen(
+            hasCritical: data['hasCritical'] as bool,
+            scaleName: data['scaleName'] as String,
+          );
+        },
       ),
       GoRoute(
   path: '/legal/consent',

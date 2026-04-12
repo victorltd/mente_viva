@@ -334,77 +334,83 @@ class _TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         child: Padding(
           padding: const EdgeInsets.all(AppSizes.md),
-          child: Row(
-            children: [
-              // ══════════════════════════════════════
-              // EMOJI / STATUS ICON
-              // ══════════════════════════════════════
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: _getBackgroundColor(),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                // ══════════════════════════════════════
+                // EMOJI / STATUS ICON
+                // ══════════════════════════════════════
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: _getBackgroundColor(),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  ),
+                  child: Center(
+                    child: _buildIcon(),
+                  ),
                 ),
-                child: Center(
-                  child: _buildIcon(),
-                ),
-              ),
-              const SizedBox(width: AppSizes.md),
+                const SizedBox(width: AppSizes.md),
 
-              // ══════════════════════════════════════
-              // INFO
-              // ══════════════════════════════════════
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      task.title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            decoration:
-                                isCompleted ? TextDecoration.lineThrough : null,
-                            color: isCompleted || isSkipped
-                                ? AppColors.textLight
-                                : null,
-                          ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text(
-                          task.typeLabel,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        if (task.isRecurring) ...[
-                          const SizedBox(width: AppSizes.xs),
-                          Icon(
-                            Icons.repeat,
-                            size: 12,
-                            color: AppColors.textLight,
-                          ),
-                        ],
-                      ],
-                    ),
-                    if (isOverdue && task.isPending) ...[
-                      const SizedBox(height: 4),
+                // ══════════════════════════════════════
+                // INFO
+                // ══════════════════════════════════════
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'Atrasada',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.error,
-                              fontWeight: FontWeight.w600,
+                        task.title,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              decoration:
+                                  isCompleted ? TextDecoration.lineThrough : null,
+                              color: isCompleted || isSkipped
+                                  ? AppColors.textLight
+                                  : null,
                             ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text(
+                            task.typeLabel,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          if (task.isRecurring) ...[
+                            const SizedBox(width: AppSizes.xs),
+                            Icon(
+                              Icons.repeat,
+                              size: 12,
+                              color: AppColors.textLight,
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (isOverdue && task.isPending) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Atrasada',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColors.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
 
-              // ══════════════════════════════════════
-              // STATUS / ARROW
-              // ══════════════════════════════════════
-              _buildStatusIndicator(),
-            ],
+                // ══════════════════════════════════════
+                // STATUS / ARROW
+                // ══════════════════════════════════════
+                _buildStatusIndicator(),
+              ],
+            ),
           ),
         ),
       ),
