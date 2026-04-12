@@ -17,15 +17,20 @@ class SupabaseService {
   
   static Future<void> initialize() async {
     try {
+      // Limpar a URL (remover barra no final e espaços)
+      final cleanUrl = Env.supabaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+      final cleanKey = Env.supabaseAnonKey.trim();
+
       debugPrint('══════════════════════════════════════════════════════════');
       debugPrint('🔌 Inicializando Supabase...');
-      debugPrint('   URL: ${Env.supabaseUrl}');
+      debugPrint('   URL Original: ${Env.supabaseUrl}');
+      debugPrint('   URL Limpa: $cleanUrl');
       debugPrint('   Produção: ${Env.isProduction}');
       debugPrint('══════════════════════════════════════════════════════════');
 
       await Supabase.initialize(
-        url: Env.supabaseUrl,
-        anonKey: Env.supabaseAnonKey,
+        url: cleanUrl,
+        anonKey: cleanKey,
         debug: !Env.isProduction,
       );
 

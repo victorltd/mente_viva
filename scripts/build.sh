@@ -3,6 +3,21 @@ set -e
 
 echo "📦 Configurando Flutter SDK..."
 
+# Debug: Verificar variáveis de ambiente
+echo "🔍 Verificando variáveis de ambiente..."
+if [ -z "$SUPABASE_URL" ]; then
+  echo "❌ ERRO: SUPABASE_URL não está definida!"
+  exit 1
+fi
+if [ -z "$SUPABASE_ANON_KEY" ]; then
+  echo "❌ ERRO: SUPABASE_ANON_KEY não está definida!"
+  exit 1
+fi
+
+echo "✅ SUPABASE_URL: ${SUPABASE_URL:0:30}..."
+echo "✅ SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:0:20}..."
+echo "✅ PRODUCTION: $PRODUCTION"
+
 # 1. Baixar ou atualizar Flutter (usando branch stable para evitar erros de versão)
 if [ ! -d "flutter" ]; then
   echo "⬇️ Clonando Flutter SDK (branch stable)..."
