@@ -1,7 +1,6 @@
 {
-  "buildCommand": "if cd flutter; then git pull && cd .. ; else git clone https://github.com/flutter/flutter.git; fi && export PATH=\"$PATH:`pwd`/flutter/bin\" && flutter config --enable-web && flutter build web --release --dart-define=SUPABASE_URL=${SUPABASE_URL} --dart-define=SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY} --dart-define=PRODUCTION=true",
+  "buildCommand": "bash scripts/build.sh",
   "outputDirectory": "build/web",
-  "installCommand": "if cd flutter; then git pull && cd .. ; else git clone https://github.com/flutter/flutter.git; fi && export PATH=\"$PATH:`pwd`/flutter/bin\" && flutter doctor && flutter pub get",
   "rewrites": [
     {
       "source": "/(.*)",
