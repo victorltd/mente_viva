@@ -100,7 +100,7 @@ class _OnboardingPatientScreenState
         },
       );
 
-      print('=== LINK RESULT: $result ===');
+      debugPrint('=== LINK RESULT: $result ===');
 
       if (result != null && result['success'] == true) {
         // Marcar onboarding como completo

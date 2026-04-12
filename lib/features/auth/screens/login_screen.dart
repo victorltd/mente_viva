@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_sizes.dart';
+import '../../../core/supabase/supabase_service.dart';
 import '../../../core/widgets/menteviva_logo.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/consent_provider.dart';
@@ -184,9 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      // TODO: Implementar recuperação de senha
-                    },
+                    onPressed: _showForgotPasswordDialog,
                     child: const Text('Esqueceu a senha?'),
                   ),
                 ),
@@ -265,6 +264,137 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  // ══════════════════════════════════════
+  // DIÁLOGO DE RECUPERAÇÃO DE SENHA
+  // ══════════════════════════════════════
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController();
+    bool isLoading = false;
+    String? error;
+    bool success = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Recuperar Senha'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (success)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Column(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.green, size: 48),
+                            SizedBox(height: 8),
+                            Text(
+                              'E-mail de recuperação enviado!',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.',
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    else ...[
+                      const Text(
+                        'Digite seu e-mail para receber as instruções de recuperação de senha:',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'E-mail',
+                          prefixIcon: Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      if (error != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          error!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Fechar'),
+                ),
+                if (!success)
+                  ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            final email = emailController.text.trim();
+                            if (email.isEmpty) {
+                              setState(() => error = 'Digite seu e-mail');
+                              return;
+                            }
+                            if (!email.contains('@')) {
+                              setState(() => error = 'E-mail inválido');
+                              return;
+                            }
+
+                            setState(() {
+                              isLoading = true;
+                              error = null;
+                            });
+
+                            try {
+                              await SupabaseService.client.auth
+                                  .resetPasswordForEmail(email);
+                              setState(() => success = true);
+                            } catch (e) {
+                              setState(() {
+                                error = 'Erro ao enviar. Verifique o e-mail e tente novamente.';
+                              });
+                            } finally {
+                              setState(() => isLoading = false);
+                            }
+                          },
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Enviar'),
+                  ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

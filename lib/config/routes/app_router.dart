@@ -1,5 +1,6 @@
 // lib/config/routes/app_router.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -36,7 +37,35 @@ import '../../features/splash/splash_screen.dart';
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
-    debugLogDiagnostics: true,
+    // Apenas loggar diagnósticos em modo debug
+    debugLogDiagnostics: kDebugMode,
+
+    // Tratamento de erros de rotas
+    errorBuilder: (context, state) => Scaffold(
+      appBar: AppBar(title: const Text('Erro')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                'Rota não encontrada: ${state.uri.path}',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.go('/'),
+                child: const Text('Voltar para Home'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
 
     routes: [
       // ══════════════════════════════════════
@@ -81,7 +110,12 @@ class AppRouter {
       GoRoute(
         path: '/psi/patient',
         builder: (context, state) {
-          final patient = state.extra as Map<String, dynamic>;
+          final patient = state.extra as Map<String, dynamic>?;
+          if (patient == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados do paciente não fornecidas')),
+            );
+          }
           return PatientDetailScreen(patient: patient);
         },
       ),
@@ -96,28 +130,48 @@ class AppRouter {
       GoRoute(
         path: '/psi/create-task',
         builder: (context, state) {
-          final patient = state.extra as Map<String, dynamic>;
+          final patient = state.extra as Map<String, dynamic>?;
+          if (patient == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados do paciente não fornecidos')),
+            );
+          }
           return CreateTaskScreen(patient: patient);
         },
       ),
       GoRoute(
         path: '/psi/task',
         builder: (context, state) {
-          final task = state.extra as TaskModel;
+          final task = state.extra as TaskModel?;
+          if (task == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados da tarefa não fornecidos')),
+            );
+          }
           return PsiTaskDetailScreen(task: task);
         },
       ),
       GoRoute(
         path: '/psi/scale-results',
         builder: (context, state) {
-          final assignmentId = state.extra as String;
+          final assignmentId = state.extra as String?;
+          if (assignmentId == null || assignmentId.isEmpty) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: ID da escala não fornecido')),
+            );
+          }
           return ScaleResultsScreen(assignmentId: assignmentId);
         },
       ),
       GoRoute(
         path: '/psi/select-scale',
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>;
+          final data = state.extra as Map<String, dynamic>?;
+          if (data == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados não fornecidos')),
+            );
+          }
           return SelectScaleScreen(
             patientId: data['patientId'] as String,
             patientName: data['patientName'] as String,
@@ -127,7 +181,12 @@ class AppRouter {
       GoRoute(
         path: '/psi/configure-scale',
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>;
+          final data = state.extra as Map<String, dynamic>?;
+          if (data == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados não fornecidos')),
+            );
+          }
           return ConfigureScaleScreen(
             template: data['template'],
             customScale: data['customScale'],
@@ -139,7 +198,12 @@ class AppRouter {
       GoRoute(
         path: '/psi/edit-scale',
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>;
+          final data = state.extra as Map<String, dynamic>?;
+          if (data == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados não fornecidos')),
+            );
+          }
           return EditScaleScreen(
             template: data['template'],
             patientId: data['patientId'] as String,
@@ -150,9 +214,15 @@ class AppRouter {
       GoRoute(
         path: '/psi/create-custom-scale',
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>;
+          final data = state.extra as Map<String, dynamic>?;
+          final patientId = data?['patientId'] as String?;
+          if (patientId == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: ID do paciente não fornecido')),
+            );
+          }
           return CreateCustomScaleScreen(
-            patientId: data['patientId'] as String,
+            patientId: patientId,
           );
         },
       ),
@@ -179,7 +249,12 @@ class AppRouter {
       GoRoute(
         path: '/app/task',
         builder: (context, state) {
-          final task = state.extra as TaskModel;
+          final task = state.extra as TaskModel?;
+          if (task == null) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: Dados da tarefa não fornecidos')),
+            );
+          }
           return TaskDetailScreen(task: task);
         },
       ),
@@ -190,17 +265,28 @@ class AppRouter {
       GoRoute(
         path: '/app/scale-answer',
         builder: (context, state) {
-          final assignmentId = state.extra as String;
+          final assignmentId = state.extra as String?;
+          if (assignmentId == null || assignmentId.isEmpty) {
+            return const Scaffold(
+              body: Center(child: Text('Erro: ID da escala não fornecido')),
+            );
+          }
           return AnswerScaleScreen(assignmentId: assignmentId);
         },
       ),
       GoRoute(
         path: '/app/scale-completed',
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>;
+          final data = state.extra as Map<String, dynamic>?;
+          if (data == null) {
+            return const ScaleCompletedScreen(
+              hasCritical: false,
+              scaleName: 'Escala',
+            );
+          }
           return ScaleCompletedScreen(
-            hasCritical: data['hasCritical'] as bool,
-            scaleName: data['scaleName'] as String,
+            hasCritical: data['hasCritical'] as bool? ?? false,
+            scaleName: data['scaleName'] as String? ?? 'Escala',
           );
         },
       ),

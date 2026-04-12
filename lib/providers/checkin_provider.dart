@@ -221,7 +221,7 @@ class CheckinNotifier extends Notifier<CheckinState> {
           'created_at': DateTime.now().toIso8601String(),
         }).eq('id', existing['id']);
 
-        print('=== CHECK-IN ATUALIZADO (já existia hoje) ===');
+        debugPrint('=== CHECK-IN ATUALIZADO (já existia hoje) ===');
       } else {
         // ══════════════════════════════════════
         // NÃO EXISTE HOJE → CRIA NOVO
@@ -235,7 +235,7 @@ class CheckinNotifier extends Notifier<CheckinState> {
           'notes': notes,
         });
 
-        print('=== NOVO CHECK-IN CRIADO ===');
+        debugPrint('=== NOVO CHECK-IN CRIADO ===');
       }
 
       // Recarrega

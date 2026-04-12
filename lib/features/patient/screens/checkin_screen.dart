@@ -57,14 +57,14 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen> {
     final patientState = ref.read(patientProvider);
     
     // DEBUG
-    print('=== DEBUG CHECKIN ===');
-    print('Patient state loading: ${patientState.isLoading}');
-    print('Patient: ${patientState.patient}');
-    print('Patient ID: ${patientState.patient?.id}');
-    print('Patient error: ${patientState.error}');
-    print('Mood: $_selectedMood');
-    print('Emotion: $_selectedEmotion');
-    print('====================');
+    debugPrint('=== DEBUG CHECKIN ===');
+    debugPrint('Patient state loading: ${patientState.isLoading}');
+    debugPrint('Patient: ${patientState.patient}');
+    debugPrint('Patient ID: ${patientState.patient?.id}');
+    debugPrint('Patient error: ${patientState.error}');
+    debugPrint('Mood: $_selectedMood');
+    debugPrint('Emotion: $_selectedEmotion');
+    debugPrint('====================');
 
     if (patientState.patient == null) {
       if (mounted) {
@@ -90,10 +90,10 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen> {
         );
 
     // DEBUG
-    print('=== RESULTADO ===');
-    print('Success: $success');
-    print('Checkin error: ${ref.read(checkinProvider).error}');
-    print('=================');
+    debugPrint('=== RESULTADO ===');
+    debugPrint('Success: $success');
+    debugPrint('Checkin error: ${ref.read(checkinProvider).error}');
+    debugPrint('=================');
 
     if (success && patientState.patient != null) {
       // Verificar conquistas

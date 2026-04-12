@@ -1,30 +1,41 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+// Teste básico do MenteViva - sem dependência de Supabase
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:menteviva/main.dart';
+import 'package:menteviva/config/constants/app_constants.dart';
 
+/// Test básico das constantes do app
+/// (Não requer Supabase inicializado)
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('AppConstants', () {
+    test('appName deve ser definido', () {
+      expect(AppConstants.appName, isNotEmpty);
+      expect(AppConstants.appName, 'MenteViva');
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    test('moodEmojis deve ter 5 níveis', () {
+      expect(AppConstants.moodEmojis.length, 5);
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    test('emotions deve ter entries', () {
+      expect(AppConstants.emotions.length, greaterThan(0));
+    });
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  // Test visual simples sem dependências
+  testWidgets('MaterialApp renders correctly', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: const Scaffold(
+          body: Center(
+            child: Text('MenteViva Test'),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('MenteViva Test'), findsOneWidget);
+    expect(find.byType(Scaffold), findsOneWidget);
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }
