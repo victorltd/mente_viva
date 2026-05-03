@@ -16,6 +16,13 @@ migrate_working_dir/
 .env
 .env.local
 .env.production
+.env.development
+
+# Non-code project files
+marketing/
+tools/
+verdps.txt
+Novo(a) Documento de Texto.txt
 
 # IntelliJ related
 *.iml

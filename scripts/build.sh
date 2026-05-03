@@ -44,6 +44,10 @@ echo "🔨 Gerando build de produção..."
 flutter build web --release \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+  --dart-define=DEMO_PSI_EMAIL="$DEMO_PSI_EMAIL" \
+  --dart-define=DEMO_PSI_PASSWORD="$DEMO_PSI_PASSWORD" \
+  --dart-define=DEMO_PATIENT_EMAIL="$DEMO_PATIENT_EMAIL" \
+  --dart-define=DEMO_PATIENT_PASSWORD="$DEMO_PATIENT_PASSWORD" \
   --dart-define=PRODUCTION=true
 
 echo "✅ Build concluído com sucesso!"
