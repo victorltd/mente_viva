@@ -155,6 +155,18 @@ class _OnboardingPatientScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Conectar ao Psicólogo'),
+        actions: [
+          TextButton.icon(
+            onPressed: () async {
+              await ref.read(authProvider.notifier).signOut();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            icon: const Icon(Icons.logout, size: 20),
+            label: const Text('Sair'),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -388,6 +400,19 @@ class _OnboardingPatientScreenState
                       ),
                     ],
                   ),
+                ),
+
+                const SizedBox(height: AppSizes.lg),
+
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    await ref.read(authProvider.notifier).signOut();
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
+                  icon: const Icon(Icons.logout, size: 18),
+                  label: const Text('Sair e voltar para o login'),
                 ),
               ],
             ],

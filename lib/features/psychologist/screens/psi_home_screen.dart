@@ -9,6 +9,8 @@ import '../../../core/supabase/supabase_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/alert_provider.dart';
 import '../../../providers/feature_provider.dart';
+import '../../demo/demo_banner.dart';
+import '../../../config/constants/demo_constants.dart';
 
 class PsiHomeScreen extends ConsumerStatefulWidget {
   const PsiHomeScreen({super.key});
@@ -56,6 +58,34 @@ class _PsiHomeScreenState extends ConsumerState<PsiHomeScreen> {
   }
 
   Future<void> _addPatient() async {
+    final authState = ref.read(authProvider);
+
+    if (authState.isDemoMode) {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          icon: const Icon(Icons.lock_outline_rounded,
+              size: 48, color: AppColors.textLight),
+          title: const Text(DemoConstants.blockedTitle),
+          content: const Text(DemoConstants.blockedDescription),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Fechar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text(DemoConstants.blockedCta),
+            ),
+          ],
+        ),
+      );
+      if (result == true && mounted) {
+        context.go('/register');
+      }
+      return;
+    }
+
     final nameController = TextEditingController();
     final emailController = TextEditingController();
 
@@ -263,6 +293,11 @@ class _PsiHomeScreenState extends ConsumerState<PsiHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ══════════════════════════════════════
+              // BANNER DEMO
+              // ══════════════════════════════════════
+              if (authState.isDemoMode) const DemoBanner(),
+
               // ══════════════════════════════════════
               // SAUDAÇÃO
               // ══════════════════════════════════════

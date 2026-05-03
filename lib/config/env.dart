@@ -30,6 +30,22 @@ class Env {
     defaultValue: false,
   );
 
+  // Demo
+  static const String demoPsiEmail =
+      String.fromEnvironment('DEMO_PSI_EMAIL', defaultValue: '');
+
+  static const String demoPsiPassword =
+      String.fromEnvironment('DEMO_PSI_PASSWORD', defaultValue: '');
+
+  static const String demoPatientEmail =
+      String.fromEnvironment('DEMO_PATIENT_EMAIL', defaultValue: '');
+
+  static const String demoPatientPassword =
+      String.fromEnvironment('DEMO_PATIENT_PASSWORD', defaultValue: '');
+
+  static bool get isDemoConfigured =>
+      demoPsiEmail.isNotEmpty && demoPsiPassword.isNotEmpty;
+
   // Validação em runtime (apenas em produção)
   static void validate() {
     if (isProduction && (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty)) {

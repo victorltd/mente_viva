@@ -7,6 +7,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_sizes.dart';
 import '../../../config/constants/app_constants.dart';
 import '../../../providers/auth_provider.dart';
+import '../../demo/demo_banner.dart';
 import '../../../core/widgets/emergency_banner.dart';
 import '../../../providers/patient_provider.dart';
 import '../../../providers/checkin_provider.dart';
@@ -186,6 +187,11 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen>
       ),
       body: Column(
         children: [
+          // ══════════════════════════════════════
+          // BANNER DEMO
+          // ══════════════════════════════════════
+          if (authState.isDemoMode) const DemoBanner(),
+
           // ══════════════════════════════════════
           // BANNER DE EMERGÊNCIA (se humor crítico)
           // ══════════════════════════════════════

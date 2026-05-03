@@ -1,5 +1,6 @@
 // lib/config/routes/app_router.dart
 
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,14 +34,36 @@ import '../../features/legal/screens/privacy_policy_screen.dart';
 import '../../features/legal/screens/data_export_screen.dart';
 import '../../features/legal/screens/delete_account_screen.dart';
 import '../../features/splash/splash_screen.dart';
+import '../../features/demo/demo_screen.dart';
+import '../../core/supabase/supabase_service.dart';
+import '../../config/constants/app_constants.dart';
+
+class _AuthChangeNotifier extends ChangeNotifier {
+  StreamSubscription? _subscription;
+
+  _AuthChangeNotifier() {
+    _subscription = SupabaseService.client.auth.onAuthStateChange.listen((_) {
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+}
 
 class AppRouter {
+  static final _authNotifier = _AuthChangeNotifier();
+
   static final GoRouter router = GoRouter(
     initialLocation: '/',
-    // Apenas loggar diagnósticos em modo debug
     debugLogDiagnostics: kDebugMode,
+    refreshListenable: _authNotifier,
 
-    // Tratamento de erros de rotas
+    redirect: _authGuard,
+
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Erro')),
       body: Center(
@@ -98,6 +121,15 @@ class AppRouter {
       GoRoute(
         path: '/onboarding/patient',
         builder: (context, state) => const OnboardingPatientScreen(),
+      ),
+
+      // ══════════════════════════════════════
+      // DEMO
+      // ══════════════════════════════════════
+      GoRoute(
+        path: '/demo',
+        name: 'demo',
+        builder: (context, state) => const DemoScreen(),
       ),
 
       // ══════════════════════════════════════
@@ -315,4 +347,38 @@ GoRoute(
 ),
     ],
   );
+
+  static String? _authGuard(BuildContext context, GoRouterState state) {
+    final session = SupabaseService.client.auth.currentSession;
+    final isAuthenticated = session != null;
+    final currentPath = state.matchedLocation;
+
+    final publicRoutes = ['/', '/login', '/register', '/demo'];
+    final isPublic = publicRoutes.contains(currentPath);
+
+    if (!isAuthenticated && !isPublic) {
+      return '/login';
+    }
+
+    if (isAuthenticated && (currentPath == '/login' || currentPath == '/register')) {
+      return '/';
+    }
+
+    final role = session?.user.userMetadata?['role'] as String?;
+    if (role == null) return null;
+
+    final isPsiRoute = currentPath.startsWith('/psi');
+    final isPatientRoute = currentPath.startsWith('/app');
+    final isOnboardingPsi = currentPath == '/onboarding/psychologist';
+    final isOnboardingPatient = currentPath == '/onboarding/patient';
+
+    if (role == AppConstants.rolePsychologist && (isPatientRoute || isOnboardingPatient)) {
+      return '/';
+    }
+    if (role == AppConstants.rolePatient && (isPsiRoute || isOnboardingPsi)) {
+      return '/';
+    }
+
+    return null;
+  }
 }

@@ -5,6 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import '../core/supabase/supabase_service.dart';
 import '../models/profile_model.dart';
+import '../config/env.dart';
+
+// ══════════════════════════════════════
+// DEMO ROLE
+// ══════════════════════════════════════
+enum DemoRole { psychologist, patient }
 
 // ══════════════════════════════════════
 // AUTH STATE
@@ -15,12 +21,14 @@ class AppAuthState {
   final User? user;
   final ProfileModel? profile;
   final String? error;
+  final bool isDemoMode;
 
   const AppAuthState({
     this.isLoading = false,
     this.user,
     this.profile,
     this.error,
+    this.isDemoMode = false,
   });
 
   AppAuthState copyWith({
@@ -31,12 +39,14 @@ class AppAuthState {
     bool clearError = false,
     bool clearUser = false,
     bool clearProfile = false,
+    bool? isDemoMode,
   }) {
     return AppAuthState(
       isLoading: isLoading ?? this.isLoading,
       user: clearUser ? null : (user ?? this.user),
       profile: clearProfile ? null : (profile ?? this.profile),
       error: clearError ? null : (error ?? this.error),
+      isDemoMode: isDemoMode ?? this.isDemoMode,
     );
   }
 
@@ -221,6 +231,67 @@ class AuthNotifier extends Notifier<AppAuthState> {
   // LOGOUT
   // ══════════════════════════════════════
   Future<void> signOut() async {
+    await _client.auth.signOut();
+    state = const AppAuthState();
+  }
+
+  // ══════════════════════════════════════
+  // DEMO LOGIN
+  // ══════════════════════════════════════
+  Future<bool> signInAsDemo(DemoRole role) async {
+    debugPrint('══════════════════════════════════════════════');
+    debugPrint('🎭 Iniciando login demo: ${role.name}');
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    final email = role == DemoRole.psychologist
+        ? Env.demoPsiEmail
+        : Env.demoPatientEmail;
+    final password = role == DemoRole.psychologist
+        ? Env.demoPsiPassword
+        : Env.demoPatientPassword;
+
+    try {
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.user != null) {
+        state = state.copyWith(
+          user: response.user,
+          isLoading: false,
+          isDemoMode: true,
+        );
+        await _loadProfile();
+        debugPrint('✅ Demo login OK: ${role.name}');
+        debugPrint('══════════════════════════════════════════════');
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false);
+      return false;
+    } on AuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Não foi possível acessar o demo. Tente novamente.',
+      );
+      debugPrint('❌ Demo login falhou: $e');
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Não foi possível acessar o demo. Tente novamente.',
+      );
+      debugPrint('❌ Demo login erro: $e');
+      return false;
+    }
+  }
+
+  // ══════════════════════════════════════
+  // DEMO LOGOUT
+  // ══════════════════════════════════════
+  Future<void> signOutDemo() async {
     await _client.auth.signOut();
     state = const AppAuthState();
   }
