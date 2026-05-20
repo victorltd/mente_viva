@@ -274,11 +274,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSizes.sm),
-                OutlinedButton.icon(
-                  onPressed: () => context.go('/demo'),
-                  icon: const Icon(Icons.play_circle_outline_rounded),
-                  label: const Text('Experimentar sem criar conta'),
-                ),
               ],
             ),
           ),

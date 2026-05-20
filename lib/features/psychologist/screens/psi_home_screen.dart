@@ -9,7 +9,6 @@ import '../../../core/supabase/supabase_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/alert_provider.dart';
 import '../../../providers/feature_provider.dart';
-import '../../demo/demo_banner.dart';
 import '../../../config/constants/demo_constants.dart';
 
 class PsiHomeScreen extends ConsumerStatefulWidget {
@@ -293,11 +292,6 @@ class _PsiHomeScreenState extends ConsumerState<PsiHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ══════════════════════════════════════
-              // BANNER DEMO
-              // ══════════════════════════════════════
-              if (authState.isDemoMode) const DemoBanner(),
-
               // ══════════════════════════════════════
               // SAUDAÇÃO
               // ══════════════════════════════════════
